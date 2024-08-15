@@ -1,0 +1,29 @@
+package com.example.gamebazzar.service;
+
+import com.example.gamebazzar.model.Game;
+import com.example.gamebazzar.model.enumerations.Genre;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface GameService {
+    // Create or Update a Game
+    Game addGame(Game game);
+
+    Game editGame(Long gameId, Game game);
+
+    // Find a Game by ID
+    Optional<Game> findGameById(Long gameId);
+
+    // Find a Game by Title
+    Optional<Game> findGameByTitle(String title);
+
+    // Get all Games
+    List<Game> findAllGames();
+
+    // Delete a Game by ID
+    void deleteGameById(Long gameId);
+
+    // Find Games by Genre
+    Game findGameByGenre(Genre genre);
+}
