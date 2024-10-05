@@ -24,6 +24,10 @@ public interface GameService {
     // Delete a Game by ID
     void deleteGameById(Long gameId);
 
-    // Find Games by Genre
-    Game findGameByGenre(Genre genre);
+
+
+
+    public List<Game> filterGamesByPublisher(String publisher);
+
+    List<Game> filterGamesByGenre(Genre genre);
 }

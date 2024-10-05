@@ -1,6 +1,8 @@
 package com.example.gamebazzar.web;
 
 
+import com.example.gamebazzar.model.DTO.filtersDTO.GameDeveloperFilterDTO;
+import com.example.gamebazzar.model.DTO.filtersDTO.GenreFilterDTO;
 import com.example.gamebazzar.model.Game;
 import com.example.gamebazzar.service.GameService;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +54,18 @@ public class GameController {
         Optional<Game> game = gameService.findGameByTitle(title);
         return game.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PostMapping("/filterByDeveloper")
+    public ResponseEntity<List<Game>> filterGamesByPublisher(@RequestBody GameDeveloperFilterDTO filterDTO) {
+        List<Game> filteredGames = gameService.filterGamesByPublisher(filterDTO.getPublisher());
+        return ResponseEntity.ok(filteredGames);
+    }
+
+    @PostMapping("/filterByGenre")
+    public ResponseEntity<List<Game>> filterByGenre(@RequestBody GenreFilterDTO genreFilterDTO) {
+        List<Game> filteredGames = gameService.filterGamesByGenre(genreFilterDTO.getGenre());
+        return ResponseEntity.ok(filteredGames);
     }
 }

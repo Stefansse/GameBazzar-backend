@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 
 @Service
@@ -38,10 +39,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setEmail(signUpRequest.getEmail());
         user.setFirstName(signUpRequest.getFirstname());
         user.setLastName(signUpRequest.getLastname());
+        user.setDateOfBirth(signUpRequest.getDateOfBirth());
         user.setRole(Role.ROLE_USER);
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         User savedUser = userRepository.save(user);
+
+        user.setDateJoined(LocalDate.now());
 
         // Create a new cart for the user
         Cart cart = new Cart();

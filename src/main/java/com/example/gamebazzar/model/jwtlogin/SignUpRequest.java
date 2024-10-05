@@ -2,6 +2,8 @@ package com.example.gamebazzar.model.jwtlogin;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class SignUpRequest {
 
@@ -13,6 +15,10 @@ public class SignUpRequest {
     private String email;
 
     private String password;
+
+    private LocalDate dateOfBirth;
+
+    private LocalDate dateJoined;
 
 
 

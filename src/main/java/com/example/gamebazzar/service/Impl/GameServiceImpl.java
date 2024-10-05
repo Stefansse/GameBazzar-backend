@@ -60,7 +60,14 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game findGameByGenre(Genre genre) {
+    public List<Game> filterGamesByGenre(Genre genre) {
         return gameRepository.findByGenre(genre);
     }
+
+    @Override
+    public List<Game> filterGamesByPublisher(String publisher) {
+        return gameRepository.findByPublisher(publisher);
+    }
+
+
 }
