@@ -53,6 +53,8 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<WishList> wishlists = new ArrayList<>();
 
+
+
     public User(String firstName, String lastName, String email, String password){
         this.firstName = firstName;
         this.lastName = lastName;

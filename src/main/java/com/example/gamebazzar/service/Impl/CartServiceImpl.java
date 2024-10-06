@@ -1,14 +1,11 @@
 package com.example.gamebazzar.service.Impl;
 
 
+import com.example.gamebazzar.model.*;
 import com.example.gamebazzar.model.Cart.Cart;
 import com.example.gamebazzar.model.Cart.CartItem;
 import com.example.gamebazzar.model.DTO.CartDTO;
 import com.example.gamebazzar.model.DTO.OrderDTO;
-import com.example.gamebazzar.model.Game;
-import com.example.gamebazzar.model.Order;
-import com.example.gamebazzar.model.OrderItem;
-import com.example.gamebazzar.model.User;
 import com.example.gamebazzar.repository.CartRepository;
 import com.example.gamebazzar.repository.OrderItemRepository;
 import com.example.gamebazzar.repository.OrderRepository;
@@ -87,25 +84,50 @@ public class CartServiceImpl implements com.example.gamebazzar.service.Impl.Cart
         // Create a new Order
         Order order = new Order();
         order.setOrderDate(LocalDate.now());
-        order.setTotalAmount(cart.getCartItems().stream()
-                .mapToDouble(item -> item.getGame().getPrice() * item.getQuantity())
-                .sum());
         order.setStatus("COMPLETED");
         order.setOrderSize(cart.getCartItems().size());
         order.setCurrency("USD");
         order.setUser(cart.getUser());
 
+        double totalAmount = 0;
+
+        // Calculate the total amount with discounts if applicable
+        for (CartItem cartItem : cart.getCartItems()) {
+            Game game = cartItem.getGame();
+            double gamePrice = game.getPrice();
+
+            // Check for an associated discount
+            Discount discount = game.getDiscount();
+            if (discount != null && isDiscountValid(discount)) { // Ensure the discount is valid
+                double discountAmount = gamePrice * (discount.getPercentage() / 100);
+                gamePrice -= discountAmount; // Apply the discount
+            }
+
+            totalAmount += gamePrice * cartItem.getQuantity();
+        }
+
+        order.setTotalAmount(totalAmount);
+
         // Save the order first
         Order savedOrder = orderRepository.save(order);
 
         // Create OrderItems and associate them with the saved Order
-        Order finalSavedOrder = savedOrder;
+        final Order finalSavedOrder = savedOrder;  // Create a final variable to use in lambda
         cart.getCartItems().forEach(cartItem -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setGame(cartItem.getGame());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setOrder(finalSavedOrder); // Associate with the saved Order
-            orderItem.setOrderItemPrice(cartItem.getGame().getPrice() * cartItem.getQuantity());
+
+            // Calculate the order item price considering the discount
+            double itemPrice = cartItem.getGame().getPrice();
+            Discount discount = cartItem.getGame().getDiscount();
+            if (discount != null && isDiscountValid(discount)) {
+                double discountAmount = itemPrice * (discount.getPercentage() / 100);
+                itemPrice -= discountAmount; // Apply the discount to the order item
+            }
+            orderItem.setOrderItemPrice(itemPrice * cartItem.getQuantity()); // Set the item price considering the quantity
+
             finalSavedOrder.addOrderItem(orderItem); // Add OrderItem to the Order
 
             // Save the OrderItem
@@ -113,13 +135,20 @@ public class CartServiceImpl implements com.example.gamebazzar.service.Impl.Cart
         });
 
         // Save the order again with associated OrderItems
-        savedOrder = orderRepository.save(savedOrder);
+        orderRepository.save(finalSavedOrder);
 
         // Clear the cart
         cart.getCartItems().clear();
         cartRepository.save(cart);
 
-        return cartMapper.convertToOrderDTO(savedOrder);
+        return cartMapper.convertToOrderDTO(finalSavedOrder);
     }
+
+    // Helper method to check if a discount is valid
+    private boolean isDiscountValid(Discount discount) {
+        LocalDate today = LocalDate.now();
+        return today.isAfter(discount.getStartDate()) && today.isBefore(discount.getEndDate());
+    }
+
 
 }

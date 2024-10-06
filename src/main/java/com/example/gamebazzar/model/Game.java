@@ -5,12 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(exclude = "discount")
 @Entity
 public class Game {
     @Id
@@ -50,6 +52,10 @@ public class Game {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<WishListItem> wishlistItems;
+
+    @OneToOne
+    @JsonIgnore
+    private Discount discount;
 
     public Game(String title, String description, LocalDate releaseDate, Double price, Genre genre, String publisher, Double rating) {
         this.title = title;
