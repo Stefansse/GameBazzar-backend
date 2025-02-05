@@ -14,17 +14,20 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import org.springframework.security.core.GrantedAuthority;
 
 @Service
 public class JWTServiceImpl implements JWTService {
 
-    public String generateToken(UserDetails userDetails){
-        return Jwts.builder().setSubject(userDetails.getUsername())
+    public String generateToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())  // This can be the email or username// Add role as a claim
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours expiration
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public String generateRefreshToken(Map<String, Objects> extraClaims, UserDetails userDetails){
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
@@ -33,6 +36,8 @@ public class JWTServiceImpl implements JWTService {
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -45,7 +50,8 @@ public class JWTServiceImpl implements JWTService {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    @Override
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -65,7 +71,7 @@ public class JWTServiceImpl implements JWTService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 }

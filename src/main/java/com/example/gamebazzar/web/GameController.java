@@ -2,6 +2,7 @@ package com.example.gamebazzar.web;
 
 
 import com.example.gamebazzar.model.DTO.filtersDTO.GameDeveloperFilterDTO;
+import com.example.gamebazzar.model.DTO.filtersDTO.GameFilterDTO;
 import com.example.gamebazzar.model.DTO.filtersDTO.GenreFilterDTO;
 import com.example.gamebazzar.model.Game;
 import com.example.gamebazzar.service.GameService;
@@ -13,6 +14,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/games")
+@CrossOrigin(origins = "http://localhost:5173")
+
 public class GameController {
 
     private final GameService gameService;
@@ -68,4 +71,30 @@ public class GameController {
         List<Game> filteredGames = gameService.filterGamesByGenre(genreFilterDTO.getGenre());
         return ResponseEntity.ok(filteredGames);
     }
+
+    @GetMapping("/api/games/sorted")
+    public List<Game> getGamesSortedByPrice(@RequestParam(defaultValue = "asc") String sortOrder) {
+        return gameService.findAllGamesSortedByPrice(sortOrder);
+    }
+
+    @PostMapping("/filter/publisher")
+    public List<Game> filterByPublisher(@RequestBody GameDeveloperFilterDTO filterDTO) {
+        return gameService.filterGamesByPublisher(filterDTO.getPublisher());
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<List<Game>> filterGames(@RequestBody GameFilterDTO filterDTO) {
+        List<Game> filteredGames = gameService.filterGames(
+                filterDTO.getGenre(),
+                filterDTO.getPublisher()
+        );
+        return ResponseEntity.ok(filteredGames);
+    }
+
+
+    @GetMapping("/search")
+    public List<Game> searchGamesByTitle(@RequestParam String title) {
+        return gameService.getGamesByTitle(title);
+    }
+
 }

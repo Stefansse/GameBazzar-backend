@@ -33,21 +33,28 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http.csrf().disable()
-                .cors(withDefaults()) // Enable CORS with default settings
+        http
+                .csrf().disable()
+                .cors(withDefaults())  // Enable CORS with default settings
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/h2/**")).permitAll()
-                        .requestMatchers("/api/**").hasAnyAuthority(Role.ROLE_ADMIN.name(), Role.ROLE_USER.name())
-                        .anyRequest().permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/**",  // Public authentication endpoints
+                                "/h2/**",           // H2 console access
+                                "/error",           // Error page
+                                "/favicon.ico",     // Favicon
+                                "/static/**",
+                                "/api/games/**"// Static files
+                        ).permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority(Role.ROLE_ADMIN.name())  // Admin role required// Authenticated users required
+                        .anyRequest().authenticated()// Other endpoints open to all
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session management
+                )
+                .authenticationProvider(authenticationProvider())  // Custom authentication provider
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);  // JWT authentication filter
 
-        http.headers().frameOptions().disable();
-
+        http.headers().frameOptions().disable();  // Disable frame options for H2 console
         return http.build();
     }
 
@@ -73,10 +80,13 @@ public class SecurityConfiguration {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("https://blog-buster-fronted.vercel.app/");
+        config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        config.addExposedHeader("Authorization");  // Expose Authorization header
+
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

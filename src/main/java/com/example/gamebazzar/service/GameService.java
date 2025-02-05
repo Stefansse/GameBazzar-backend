@@ -30,4 +30,12 @@ public interface GameService {
     public List<Game> filterGamesByPublisher(String publisher);
 
     List<Game> filterGamesByGenre(Genre genre);
+
+
+    List<Game> findAllGamesSortedByPrice(String sortOrder);
+
+    List<Game> filterGames(String genre, String publisher);
+
+     List<Game> getGamesByTitle(String title);
+
 }

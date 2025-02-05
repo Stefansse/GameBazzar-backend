@@ -1,5 +1,6 @@
 package com.example.gamebazzar.service;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Map;
@@ -13,4 +14,8 @@ public interface JWTService {
     boolean isTokenValid(String token, UserDetails userDetails);
 
     public String generateRefreshToken(Map<String, Objects> extraClaims, UserDetails userDetails);
+
+    Claims extractAllClaims(String token);
+
+
 }

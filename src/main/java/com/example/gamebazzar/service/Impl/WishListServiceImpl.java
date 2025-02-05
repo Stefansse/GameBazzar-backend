@@ -109,13 +109,10 @@ public class WishListServiceImpl implements WishListService {
         WishList wishList = wishListRepository.findById(wishlistId)
                 .orElseThrow(() -> new RuntimeException("WishList not found"));
 
-        // Remove all wishlist items
         wishListItemRepository.deleteAll(wishList.getWishlistItems());
 
-        // Optionally, clear the list in the wishlist entity
         wishList.getWishlistItems().clear();
 
-        // Save the wishlist to persist the changes
         wishListRepository.save(wishList);
     }
 }

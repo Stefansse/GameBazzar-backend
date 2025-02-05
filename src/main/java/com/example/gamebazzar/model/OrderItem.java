@@ -27,6 +27,6 @@ public class OrderItem {
     @Column(nullable = false, name = "OrderItemPrice")
     private Double orderItemPrice;
 
-    // Default constructor and other constructors
+
 }
 

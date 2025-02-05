@@ -9,9 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reviews")
+@CrossOrigin(origins = "http://localhost:5173")
+
 public class ReviewController {
 
     @Autowired
@@ -38,17 +42,31 @@ public class ReviewController {
 
     // Retrieve all reviews for a specific game
     @GetMapping("/game/{gameId}")
-    public ResponseEntity<List<Review>> getReviewsByGame(@PathVariable Long gameId) {
-        List<Review> reviews = reviewService.getReviewsByGame(gameId);
+    public ResponseEntity<List<Map<String, Object>>> getReviewsByGame(@PathVariable Long gameId) {
+        List<Map<String, Object>> reviews = reviewService.getReviewsByGame(gameId);
         return ResponseEntity.ok(reviews);
     }
 
     // Retrieve all reviews by a specific user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<ReviewDTO>> getReviewsByUser(@PathVariable Long userId) {
         List<Review> reviews = reviewService.getReviewsByUser(userId);
-        return ResponseEntity.ok(reviews);
+
+        List<ReviewDTO> reviewDTOs = reviews.stream().map(review ->
+                new ReviewDTO(
+                        review.getGame().getGameId(),
+                        review.getGame().getTitle(),
+                        review.getGame().getImageUrl(),  // Assuming `Game` has an image URL
+                        review.getUser().getId(),
+                        review.getRating(),
+                        review.getComment(),
+                        review.getReviewDate()
+                )
+        ).collect(Collectors.toList());
+
+        return ResponseEntity.ok(reviewDTOs);
     }
+
 
     @PutMapping("/update/{reviewId}")
     public ResponseEntity<Review> updateReview(

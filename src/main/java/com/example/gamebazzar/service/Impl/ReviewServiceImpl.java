@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -43,11 +42,36 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     // Retrieve all reviews for a specific game
-    public List<Review> getReviewsByGame(Long gameId) {
+    public List<Map<String, Object>> getReviewsByGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Game not found"));
-        return reviewRepository.findByGame(game);
+
+        // Fetch reviews for the game
+        List<Review> reviews = reviewRepository.findByGame(game);
+
+        // Prepare a list of response maps to include userId with other review details
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Review review : reviews) {
+            Map<String, Object> reviewMap = new HashMap<>();
+            reviewMap.put("reviewId", review.getReviewId());
+            reviewMap.put("rating", review.getRating());
+            reviewMap.put("comment", review.getComment());
+            reviewMap.put("reviewDate", review.getReviewDate());
+
+            // Accessing the userId from the associated User entity
+            if (review.getUser() != null) {
+                reviewMap.put("userId", review.getUser().getId());
+            } else {
+                reviewMap.put("userId", null);  // If user is null, handle accordingly
+            }
+
+            response.add(reviewMap);
+        }
+
+        return response;
     }
+
 
     // Retrieve all reviews by a specific user
     public List<Review> getReviewsByUser(Long userId) {

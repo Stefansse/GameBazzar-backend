@@ -1,9 +1,11 @@
 package com.example.gamebazzar.model;
 
 import com.example.gamebazzar.model.enumerations.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +37,8 @@ public class User implements UserDetails {
     private String address;
 
     private LocalDate dateOfBirth;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateJoined;
 
     @Column(name = "role")
@@ -53,7 +57,14 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<WishList> wishlists = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference // This side will be serialized
+    private List<Ticket> tickets;
 
+
+    public Role getRole() {
+        return this.role;
+    }
 
     public User(String firstName, String lastName, String email, String password){
         this.firstName = firstName;
@@ -101,6 +112,11 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+
+    public Long getId() {
+        return userId;
     }
 }
 

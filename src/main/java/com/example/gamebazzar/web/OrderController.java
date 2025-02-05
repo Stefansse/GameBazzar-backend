@@ -10,6 +10,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin(origins = "http://localhost:5173")
+
 public class OrderController {
 
     private final OrderService orderService;
@@ -45,5 +47,11 @@ public class OrderController {
     public ResponseEntity<Void> deleteOrderById(@PathVariable Long orderId) {
         orderService.deleteOrderById(orderId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orders);
     }
 }

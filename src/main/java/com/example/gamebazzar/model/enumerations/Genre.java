@@ -9,5 +9,9 @@ public enum Genre {
     SPORTS,
     PUZZLE,
     SHOOTER,
-    RACING
+    RACING,
+    MMORPG,
+    FPS
+
+
 }

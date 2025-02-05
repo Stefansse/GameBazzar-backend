@@ -38,6 +38,12 @@ public class Game {
     @Column(name = "Rating")
     private double rating;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "TrailerUrl")
+    private String trailerUrl;
+
     public Game() {
 
     }
@@ -54,10 +60,10 @@ public class Game {
     private List<WishListItem> wishlistItems;
 
     @OneToOne
-    @JsonIgnore
     private Discount discount;
 
-    public Game(String title, String description, LocalDate releaseDate, Double price, Genre genre, String publisher, Double rating) {
+    public Game(String title, String description, LocalDate releaseDate,
+                Double price, Genre genre, String publisher, Double rating, String imageUrl) {
         this.title = title;
         this.description = description;
         this.releaseDate = releaseDate;
@@ -65,6 +71,7 @@ public class Game {
         this.genre = genre;
         this.publisher = publisher;
         this.rating = rating;
+        this.imageUrl = imageUrl;
         this.orderItems = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.wishlistItems = new ArrayList<>();
