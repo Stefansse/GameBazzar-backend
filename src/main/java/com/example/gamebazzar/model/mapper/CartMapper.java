@@ -1,4 +1,4 @@
-package com.example.gamebazzar.mapper;
+package com.example.gamebazzar.model.mapper;
 
 
 import com.example.gamebazzar.model.Cart.Cart;
@@ -44,6 +44,7 @@ public class CartMapper {
         dto.setGenre(game.getGenre());
         dto.setPublisher(game.getPublisher());
         dto.setRating(game.getRating());
+        dto.setDiscount(game.getDiscount());
         return dto;
     }
 

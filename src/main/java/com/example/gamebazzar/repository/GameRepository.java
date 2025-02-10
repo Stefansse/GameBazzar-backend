@@ -23,4 +23,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findAll(Sort sort);
 
 
+    List<Game> findByRatingGreaterThanEqual(Double rating);
 }

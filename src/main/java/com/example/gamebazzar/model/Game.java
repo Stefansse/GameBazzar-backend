@@ -63,7 +63,7 @@ public class Game {
     private Discount discount;
 
     public Game(String title, String description, LocalDate releaseDate,
-                Double price, Genre genre, String publisher, Double rating, String imageUrl) {
+                Double price, Genre genre, String publisher, Double rating, Discount discount, String imageUrl) {
         this.title = title;
         this.description = description;
         this.releaseDate = releaseDate;
@@ -71,6 +71,7 @@ public class Game {
         this.genre = genre;
         this.publisher = publisher;
         this.rating = rating;
+        this.discount = discount;
         this.imageUrl = imageUrl;
         this.orderItems = new ArrayList<>();
         this.reviews = new ArrayList<>();

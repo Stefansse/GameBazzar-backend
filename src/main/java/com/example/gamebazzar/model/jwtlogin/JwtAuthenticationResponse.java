@@ -14,4 +14,7 @@ public class JwtAuthenticationResponse {
     private String email;
     private LocalDate dateJoined;
     private String role;
+    private Long cartId;
+    private Long wishListId;
+
 }

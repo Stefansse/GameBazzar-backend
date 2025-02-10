@@ -1,14 +1,18 @@
 package com.example.gamebazzar.model.Cart;
 
 import com.example.gamebazzar.model.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Setter
+@Getter
 @Entity
 @Table(name = "carts")
 public class Cart {
@@ -17,8 +21,9 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
 
-    @ManyToOne
-    @JsonManagedReference
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

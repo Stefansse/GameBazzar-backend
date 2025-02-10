@@ -51,11 +51,9 @@ public class WishListController {
     }
 
     // Add a game to a wishlist
-    @PostMapping("/addGame")
-    public ResponseEntity<WishList> addGameToWishList(@RequestBody AddGameToWishListDTO request) {
-        WishList updatedWishList = wishListService.addGameToWishList(
-                request.getWishlistId(),
-                request);
+    @PostMapping("/{wishlistId}/add")
+    public ResponseEntity<WishList> addGameToWishList(@PathVariable Long wishlistId, @RequestBody AddGameToWishListDTO request) {
+        WishList updatedWishList = wishListService.addGameToWishList(wishlistId, request);
         return ResponseEntity.ok(updatedWishList);
     }
 

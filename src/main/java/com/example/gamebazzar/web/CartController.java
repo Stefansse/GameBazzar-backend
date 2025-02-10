@@ -4,14 +4,22 @@ package com.example.gamebazzar.web;
 import com.example.gamebazzar.model.DTO.CartDTO;
 import com.example.gamebazzar.model.DTO.CartItemRequest;
 import com.example.gamebazzar.model.DTO.OrderDTO;
+import com.example.gamebazzar.model.DTO.UpdateCartItemRequest;
 import com.example.gamebazzar.model.Game;
 import com.example.gamebazzar.model.User;
 import com.example.gamebazzar.service.GameService;
 import com.example.gamebazzar.service.Impl.CartService;
+import com.example.gamebazzar.service.PaymentService;
 import com.example.gamebazzar.service.UserService;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/carts")
@@ -27,6 +35,13 @@ public class CartController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private final PaymentService paymentService;
+
+    public CartController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<CartDTO> createCart(@RequestParam Long userId) {
@@ -70,4 +85,48 @@ public class CartController {
         OrderDTO orderDTO = cartService.convertCartToOrder(cartId);
         return ResponseEntity.ok(orderDTO);
     }
-}
+
+    @PostMapping("/{cartId}/stripe-checkout")
+    public ResponseEntity<?> createStripeCheckoutSession(@PathVariable Long cartId) {
+        // Fetch the cart DTO details
+        Optional<CartDTO> cartDTOOpt = cartService.getCartById(cartId);
+
+        if (cartDTOOpt.isEmpty() || cartDTOOpt.get().getCartItems().isEmpty()) {
+            return ResponseEntity.badRequest().body("Cart is empty or does not exist");
+        }
+
+        CartDTO cartDTO = cartDTOOpt.get();
+
+        try {
+            // Delegate the session creation to StripeService
+            Session session = paymentService.createCheckoutSession(cartDTO);
+            return ResponseEntity.ok(Map.of("sessionId", session.getId()));  // Send the session ID to frontend
+        } catch (StripeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Stripe session creation failed");
+        }
+    }
+
+
+    @PutMapping("/{cartId}/update-quantity/{cartItemId}")
+    public ResponseEntity<CartDTO> updateCartItemQuantity(
+            @PathVariable Long cartId,
+            @PathVariable Long cartItemId,
+            @RequestBody UpdateCartItemRequest request) {
+
+        try {
+            CartDTO updatedCart = cartService.updateCartItemQuantity(cartId, cartItemId, request.getNewQuantity());
+            return ResponseEntity.ok(updatedCart);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(null); // Or handle exception in a better way as needed
+        }
+    }
+
+
+    }
+
+
+
+
+
+

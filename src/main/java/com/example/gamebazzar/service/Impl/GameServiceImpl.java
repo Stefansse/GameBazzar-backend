@@ -113,5 +113,10 @@ public class GameServiceImpl implements GameService {
         return gameRepository.findByTitleContainingIgnoreCase(title);
     }
 
+    @Override
+    public List<Game> filterGamesByRating(Double minRating) {
+        return gameRepository.findByRatingGreaterThanEqual(minRating);
+    }
+
 
 }

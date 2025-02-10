@@ -1,5 +1,6 @@
 package com.example.gamebazzar.model.DTO;
 
+import com.example.gamebazzar.model.Discount;
 import com.example.gamebazzar.model.enumerations.Genre;
 import lombok.Data;
 
@@ -15,5 +16,6 @@ public class GameDTO {
     private Genre genre;
     private String publisher;
     private Double rating;
+    private Discount discount;
     // Exclude other fields to avoid recursion
 }

@@ -26,4 +26,6 @@ public interface CartService {
     void clearCart(Long cartId);
 
     OrderDTO convertCartToOrder(Long cartId);
+
+    CartDTO updateCartItemQuantity(Long cartId, Long cartItemId, int newQuantity);
 }

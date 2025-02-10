@@ -1,15 +1,14 @@
 package com.example.gamebazzar.service;
 
-import com.example.gamebazzar.model.DTO.PaymentDTO;
-import com.example.gamebazzar.model.Payment;
-
-import java.util.List;
+import com.example.gamebazzar.model.DTO.CartDTO;
+import com.example.gamebazzar.model.DTO.PaymentResponse;
+import com.example.gamebazzar.model.Order;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 
 public interface PaymentService {
-    Payment createPayment(PaymentDTO paymentDTO);
-    Payment getPaymentById(Long paymentId);
-    List<Payment> getPaymentsByOrderId(Long orderId);
-    List<Payment> findAllPayments();
-    Payment updatePayment(Long paymentId, String paymentStatus);
-    void deletePayment(Long paymentId);
+
+    PaymentResponse createPaymentService(Order order);
+
+    Session createCheckoutSession(CartDTO cartDTO) throws StripeException;
 }

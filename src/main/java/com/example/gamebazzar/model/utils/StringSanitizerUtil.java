@@ -1,5 +1,7 @@
 package com.example.gamebazzar.model.utils;
 
+import java.util.Random;
+
 public class StringSanitizerUtil {
 
     private StringSanitizerUtil() {
@@ -37,6 +39,19 @@ public class StringSanitizerUtil {
             return sanitizeQuotes(trimWhitespace(input));
         }
         return input;
+    }
+
+    public static String generateRandomGameCode() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuilder gameCode = new StringBuilder();
+
+        for (int i = 0; i < 10; i++) {  // Generate a 10-character code
+            int randomIndex = random.nextInt(characters.length());
+            gameCode.append(characters.charAt(randomIndex));
+        }
+
+        return gameCode.toString();
     }
 
 

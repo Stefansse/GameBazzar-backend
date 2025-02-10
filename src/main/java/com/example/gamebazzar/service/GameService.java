@@ -38,4 +38,6 @@ public interface GameService {
 
      List<Game> getGamesByTitle(String title);
 
+    List<Game> filterGamesByRating(Double minRating);
+
 }

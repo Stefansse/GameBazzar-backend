@@ -18,12 +18,14 @@ public class WishList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long wishlistId;
 
-    @Column(nullable = false, name = "CreationDate")
+    @Column(nullable = true, name = "CreationDate")
     private LocalDate creationDate;
 
-    @ManyToOne
+    @OneToOne
+    @JoinColumn(name = "user_id")  // This column will store the user id in the WishList table
     @JsonBackReference
     private User user;
+
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

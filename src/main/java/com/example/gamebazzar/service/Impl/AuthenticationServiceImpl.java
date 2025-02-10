@@ -2,6 +2,7 @@ package com.example.gamebazzar.service.Impl;
 
 import com.example.gamebazzar.model.Cart.Cart;
 import com.example.gamebazzar.model.User;
+import com.example.gamebazzar.model.WishList;
 import com.example.gamebazzar.model.enumerations.Role;
 import com.example.gamebazzar.model.jwtlogin.JwtAuthenticationResponse;
 import com.example.gamebazzar.model.jwtlogin.RefreshTokenRequest;
@@ -9,6 +10,7 @@ import com.example.gamebazzar.model.jwtlogin.SignInRequest;
 import com.example.gamebazzar.model.jwtlogin.SignUpRequest;
 import com.example.gamebazzar.repository.CartRepository;
 import com.example.gamebazzar.repository.UserRepository;
+import com.example.gamebazzar.repository.WishListRepository;
 import com.example.gamebazzar.service.AuthenticationService;
 import com.example.gamebazzar.service.JWTService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final CartRepository cartRepository;
 
+    private final WishListRepository wishListRepository;
+
     private final JWTService jwtService;
 
     public User signup(SignUpRequest signUpRequest) {
@@ -51,7 +55,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Cart cart = new Cart();
         cart.setUser(savedUser);
 
+        WishList wishList = new WishList();
+        wishList.setCreationDate(LocalDate.now());
+        wishList.setUser(savedUser);
+
         cartRepository.save(cart);
+        wishListRepository.save(wishList);
 
         return savedUser;
     }
@@ -71,6 +80,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         jwtAuthenticationResponse.setEmail(user.getEmail()); // Set email here
         jwtAuthenticationResponse.setDateJoined(user.getDateJoined());
         jwtAuthenticationResponse.setRole(user.getRole().name());
+        jwtAuthenticationResponse.setCartId(user.getCart().getCartId());
+        jwtAuthenticationResponse.setWishListId(user.getWishlist().getWishlistId());
         return jwtAuthenticationResponse;
 
     }

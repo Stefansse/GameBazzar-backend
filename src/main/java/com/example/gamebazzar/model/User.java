@@ -1,11 +1,11 @@
 package com.example.gamebazzar.model;
 
+import com.example.gamebazzar.model.Cart.Cart;
 import com.example.gamebazzar.model.enumerations.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Setter
+@Getter
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "_users")
 public class User implements UserDetails {
@@ -53,13 +56,17 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<WishList> wishlists = new ArrayList<>();
+    private WishList wishlist;
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference // This side will be serialized
     private List<Ticket> tickets;
+
+    @OneToOne(mappedBy = "user")
+    @JsonManagedReference
+    private Cart cart;
 
 
     public Role getRole() {
