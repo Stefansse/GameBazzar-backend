@@ -61,7 +61,7 @@ public class User implements UserDetails {
     private WishList wishlist;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference // This side will be serialized
+    @JsonManagedReference
     private List<Ticket> tickets;
 
     @OneToOne(mappedBy = "user")

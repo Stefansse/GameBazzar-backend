@@ -35,26 +35,26 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors(withDefaults())  // Enable CORS with default settings
+                .cors(withDefaults())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
-                                "/api/v1/auth/**",  // Public authentication endpoints
-                                "/h2/**",           // H2 console access
-                                "/error",           // Error page
-                                "/favicon.ico",     // Favicon
+                                "/api/v1/auth/**",
+                                "/h2/**",
+                                "/error",
+                                "/favicon.ico",
                                 "/static/**",
-                                "/api/games/**"// Static files
+                                "/api/games/**"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority(Role.ROLE_ADMIN.name())  // Admin role required// Authenticated users required
-                        .anyRequest().authenticated()// Other endpoints open to all
+                        .requestMatchers("/api/admin/**").hasAuthority(Role.ROLE_ADMIN.name())
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authenticationProvider(authenticationProvider())  // Custom authentication provider
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);  // JWT authentication filter
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.headers().frameOptions().disable();  // Disable frame options for H2 console
+        http.headers().frameOptions().disable();
         return http.build();
     }
 

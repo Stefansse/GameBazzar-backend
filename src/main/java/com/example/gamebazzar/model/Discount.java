@@ -17,16 +17,16 @@ public class Discount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String code;  // Discount code
+    private String code;
 
     @Column(nullable = false)
-    private double percentage;  // Discount percentage, e.g., 10 for 10%
+    private double percentage;
 
     @Column(nullable = false)
-    private LocalDate startDate;  // Start date of the discount
+    private LocalDate startDate;
 
     @Column(nullable = false)
-    private LocalDate endDate;  // End date of the discount
+    private LocalDate endDate;
 
     @ManyToOne
     @JsonIgnore

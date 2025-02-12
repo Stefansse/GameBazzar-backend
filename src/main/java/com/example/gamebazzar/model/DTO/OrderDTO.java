@@ -16,5 +16,5 @@ public class OrderDTO {
     private UserDTO user;
     private List<OrderItemDTO> orderItems;
 
-    // Getters and setters
+
 }

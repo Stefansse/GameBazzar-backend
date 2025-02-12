@@ -17,5 +17,5 @@ public class GameDTO {
     private String publisher;
     private Double rating;
     private Discount discount;
-    // Exclude other fields to avoid recursion
+
 }

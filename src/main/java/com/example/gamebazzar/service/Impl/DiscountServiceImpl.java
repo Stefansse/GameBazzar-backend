@@ -30,7 +30,7 @@ public class DiscountServiceImpl implements DiscountService {
         Game game = gameRepository.findById(discountDTO.getGameId())
                 .orElseThrow(() -> new RuntimeException("Game not found"));
 
-        // Check if the game already has a discount
+
         if (game.getDiscount() != null) {
             throw new RuntimeException("Game already has an active discount.");
         }
@@ -94,11 +94,10 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public void applyDiscountToGame(Long discountId, Long gameId) {
-        // Implementation logic to apply discount to the game
-        // You can reuse the logic from your previous implementation.
+
     }
 
-    // Helper method to convert Discount to DiscountDTO
+
     private DiscountDTO convertToDTO(Discount discount) {
         DiscountDTO discountDTO = new DiscountDTO();
         discountDTO.setId(discount.getId());
@@ -110,7 +109,7 @@ public class DiscountServiceImpl implements DiscountService {
         if (discount.getGame() != null) {
             discountDTO.setGameId(discount.getGame().getGameId());
         } else {
-            discountDTO.setGameId(null); // or handle it accordingly
+            discountDTO.setGameId(null);
         }
 
         return discountDTO;

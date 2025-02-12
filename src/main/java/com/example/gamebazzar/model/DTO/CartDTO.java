@@ -10,5 +10,5 @@ public class CartDTO {
     private UserDTO user;
     private List<CartItemDTO> cartItems;
 
-    // Getters and setters
+
 }

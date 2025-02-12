@@ -51,15 +51,13 @@ public class WishListServiceImpl implements WishListService {
         Game game = gameRepository.findById(request.getGameId())
                 .orElseThrow(() -> new RuntimeException("Game not found"));
 
-        // Check if the game is already in the wishlist
+
         WishListItem existingItem = wishListItemRepository.findByWishListAndGame(wishList, game);
 
         if (existingItem != null) {
-            // Update quantity if the game is already in the wishlist
             existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
             wishListItemRepository.save(existingItem);
         } else {
-            // Add new game to wishlist
             WishListItem wishListItem = new WishListItem(wishList, game, request.getQuantity());
             wishListItemRepository.save(wishListItem);
         }
@@ -67,13 +65,13 @@ public class WishListServiceImpl implements WishListService {
         return wishList;
     }
 
-    // Retrieve a wishlist by ID
+
     public WishList getWishListById(Long wishlistId) {
         return wishListRepository.findById(wishlistId)
                 .orElseThrow(() -> new RuntimeException("WishList not found"));
     }
 
-    // Retrieve all wishlists for a user
+
     public List<WishList> getAllWishListsForUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -91,8 +89,7 @@ public class WishListServiceImpl implements WishListService {
         WishList wishList = wishListRepository.findById(wishlistId)
                 .orElseThrow(() -> new RuntimeException("WishList not found"));
 
-        // Optionally update properties of the wishlist if needed
-        // (e.g., change creation date, etc.)
+
 
         return wishListRepository.save(wishList);
     }

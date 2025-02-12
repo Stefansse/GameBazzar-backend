@@ -10,5 +10,5 @@ public class OrderItemDTO {
     private Integer quantity;
     private Double orderItemPrice;
 
-    // Getters and setters
+
 }

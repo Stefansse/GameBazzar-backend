@@ -51,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         user.setDateJoined(LocalDate.now());
 
-        // Create a new cart for the user
+
         Cart cart = new Cart();
         cart.setUser(savedUser);
 

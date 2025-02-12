@@ -89,7 +89,7 @@ public class CartServiceImpl implements com.example.gamebazzar.service.Impl.Cart
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        // Create a new Order
+
         Order order = new Order();
         order.setOrderDate(LocalDate.now());
         order.setStatus("COMPLETED");
@@ -99,77 +99,77 @@ public class CartServiceImpl implements com.example.gamebazzar.service.Impl.Cart
 
         double totalAmount = 0;
 
-        // Calculate the total amount with discounts if applicable
+
         for (CartItem cartItem : cart.getCartItems()) {
             Game game = cartItem.getGame();
             double gamePrice = game.getPrice();
 
             // Check for an associated discount
             Discount discount = game.getDiscount();
-            if (discount != null) { // Ensure the discount is valid
+            if (discount != null) {
                 double discountAmount = gamePrice * (discount.getPercentage() / 100);
-                gamePrice -= discountAmount; // Apply the discount
+                gamePrice -= discountAmount;
             }
 
-            // Add discounted price to totalAmount, considering the quantity
+
             totalAmount += gamePrice * cartItem.getQuantity();
         }
 
-        // Set the total amount with discount applied
+
         order.setTotalAmount(totalAmount);
 
-        // Save the order first
+
         Order savedOrder = orderRepository.save(order);
 
-        // Create OrderItems and associate them with the saved Order
-        final Order finalSavedOrder = savedOrder;  // Create a final variable to use in lambda
+
+        final Order finalSavedOrder = savedOrder;
         cart.getCartItems().forEach(cartItem -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setGame(cartItem.getGame());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setOrder(finalSavedOrder); // Associate with the saved Order
+            orderItem.setOrder(finalSavedOrder);
 
-            // Calculate the order item price considering the discount
+
             double itemPrice = cartItem.getGame().getPrice();
             Discount discount = cartItem.getGame().getDiscount();
             if (discount != null && isDiscountValid(discount)) {
                 double discountAmount = itemPrice * (discount.getPercentage() / 100);
-                itemPrice -= discountAmount; // Apply the discount to the order item
+                itemPrice -= discountAmount;
             }
-            orderItem.setOrderItemPrice(itemPrice * cartItem.getQuantity()); // Set the item price considering the quantity
+            orderItem.setOrderItemPrice(itemPrice * cartItem.getQuantity());
 
-            finalSavedOrder.addOrderItem(orderItem); // Add OrderItem to the Order
+            finalSavedOrder.addOrderItem(orderItem);
 
-            // Save the OrderItem
+
             orderItemRepository.save(orderItem);
         });
 
-        // Save the order again with associated OrderItems
+
         orderRepository.save(finalSavedOrder);
 
-        // Clear the cart
+
         cart.getCartItems().clear();
         cartRepository.save(cart);
 
-        // Get game names and generate game codes for the email body
+
         StringBuilder gameNames = new StringBuilder();
         StringBuilder gameCodes = new StringBuilder();
 
         for (OrderItem orderItem : savedOrder.getOrderItems()) {
             Game game = orderItem.getGame();
-            String gameCode = generateRandomGameCode(); // Generate a random code for each game
+            String gameCode = generateRandomGameCode();
 
             gameNames.append(game.getTitle()).append(", ");
             gameCodes.append("\n- ").append(game.getTitle()).append(" (Game Code: ").append(gameCode).append(")\n");
         }
 
-        // Remove the last comma and space if there are any game names
+
         if (gameNames.length() > 0) {
             gameNames.setLength(gameNames.length() - 2);
         }
 
-        // Prepare email details
-        String userEmail = cart.getUser().getEmail(); // Assuming the User entity has an email field
+
+        String userEmail = cart.getUser().getEmail();
         String subject = "Thank You for Your Purchase!";
         String body = "Dear " + cart.getUser().getFirstName() + ",\n\n" +
                 "Thank you for your purchase! Your order for the game(s) has/have been successfully placed.\n" +
@@ -183,7 +183,7 @@ public class CartServiceImpl implements com.example.gamebazzar.service.Impl.Cart
         return cartMapper.convertToOrderDTO(finalSavedOrder);
     }
 
-    // Function to generate a random alphanumeric code for each game
+
 
 
 

@@ -22,7 +22,7 @@ public class WishList {
     private LocalDate creationDate;
 
     @OneToOne
-    @JoinColumn(name = "user_id")  // This column will store the user id in the WishList table
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
 

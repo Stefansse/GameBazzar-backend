@@ -80,11 +80,11 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<Game> findAllGamesSortedByPrice(String sortOrder) {
-        Sort sort = Sort.by("price"); // Sort by the "price" field
+        Sort sort = Sort.by("price");
         if ("desc".equalsIgnoreCase(sortOrder)) {
-            sort = sort.descending(); // Sort in descending order (high to low)
+            sort = sort.descending();
         } else {
-            sort = sort.ascending(); // Default to ascending order (low to high)
+            sort = sort.ascending();
         }
         return gameRepository.findAll(sort);
     }

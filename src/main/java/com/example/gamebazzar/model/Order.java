@@ -44,7 +44,6 @@ public class Order {
 
 
 
-    // Default constructor and other constructors
 
 
     public void addOrderItem(OrderItem orderItem) {

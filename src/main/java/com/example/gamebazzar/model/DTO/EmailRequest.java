@@ -8,7 +8,7 @@ public class EmailRequest {
     private String subject;
     private String body;
 
-    // Constructors
+
     public EmailRequest() {}
 
     public EmailRequest(String to, String subject, String body) {

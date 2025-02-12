@@ -55,49 +55,45 @@ public class PaymentServiceImpl implements PaymentService {
         Stripe.apiKey = stripeSecurityKey;
 
         try {
-            // Initialize the session parameters builder
-            SessionCreateParams.Builder sessionParamsBuilder = SessionCreateParams.builder()
-                    .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)  // Specify payment method type
-                    .setMode(SessionCreateParams.Mode.PAYMENT)  // Specify payment mode
-                    .setSuccessUrl("https://your-domain.com/success")  // Success URL
-                    .setCancelUrl("https://your-domain.com/cancel");  // Cancel URL
 
-            // Initialize line items list
+            SessionCreateParams.Builder sessionParamsBuilder = SessionCreateParams.builder()
+                    .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                    .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setSuccessUrl("https://your-domain.com/success")
+                    .setCancelUrl("https://your-domain.com/cancel");
+
+
             List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
 
-            // Loop through order items and create line items
-            for (OrderItem orderItem : order.getOrderItems()) {
-                long amountInCents = (long) (orderItem.getGame().getPrice() * 100); // Convert price to cents
 
-                // Build a line item for each order item
+            for (OrderItem orderItem : order.getOrderItems()) {
+                long amountInCents = (long) (orderItem.getGame().getPrice() * 100);
+
+
                 SessionCreateParams.LineItem lineItem = SessionCreateParams.LineItem.builder()
-                        .setQuantity(Long.valueOf(orderItem.getQuantity())) // Quantity of the item
+                        .setQuantity(Long.valueOf(orderItem.getQuantity()))
                         .setPriceData(
                                 SessionCreateParams.LineItem.PriceData.builder()
-                                        .setCurrency("usd")  // Currency
-                                        .setUnitAmount(amountInCents)  // Unit amount in cents
+                                        .setCurrency("usd")
+                                        .setUnitAmount(amountInCents)
                                         .setProductData(
                                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                        .setName(orderItem.getGame().getTitle())  // Game name
+                                                        .setName(orderItem.getGame().getTitle())
                                                         .build()
                                         )
                                         .build()
                         )
                         .build();
 
-                // Add the line item to the list
+
                 lineItems.add(lineItem);
             }
 
-            // Add all line items to the session parameters
+
             sessionParamsBuilder.addAllLineItem(lineItems);
 
-            // Create the Stripe session
             Session session = Session.create(SessionCreateParams.builder().build());
-
             PaymentResponse response = new PaymentResponse();
-
-            // Return the session ID as the response
             response.setPayment_url(session.getUrl());
 
             return response;
@@ -110,13 +106,13 @@ public class PaymentServiceImpl implements PaymentService {
     public Session createCheckoutSession(CartDTO cartDTO) {
         Stripe.apiKey = stripeSecurityKey;
         try {
-            // Map cart items to Stripe line items, applying the discount if available
+
             List<SessionCreateParams.LineItem> lineItems = cartDTO.getCartItems().stream()
                     .map(item -> {
                         double price = item.getGame().getPrice();
                         double discount = item.getGame().getDiscount() != null ? item.getGame().getDiscount().getPercentage() : 0;
 
-                        // Apply discount if applicable
+
                         if (discount > 0) {
                             price = price * (1 - discount / 100);
                         }
@@ -125,24 +121,24 @@ public class PaymentServiceImpl implements PaymentService {
                                 .setPriceData(
                                         SessionCreateParams.LineItem.PriceData.builder()
                                                 .setCurrency("usd")
-                                                .setUnitAmount((long) (price * 100))  // Convert price to cents after discount
+                                                .setUnitAmount((long) (price * 100))
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName(item.getGame().getTitle())  // Assuming getGame returns the correct game object
+                                                                .setName(item.getGame().getTitle())
                                                                 .build()
                                                 )
                                                 .build()
                                 )
-                                .setQuantity((long) item.getQuantity())  // Ensure you're getting the quantity from the DTO
+                                .setQuantity((long) item.getQuantity())
                                 .build();
                     })
                     .collect(Collectors.toList());
 
-            // Get the cart from the repository
+
             Cart cart = cartRepository.findById(cartDTO.getCartId())
                     .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-            // Create the order
+
             Order order = new Order();
             order.setOrderDate(LocalDate.now());
             order.setStatus("COMPLETED");
@@ -152,71 +148,71 @@ public class PaymentServiceImpl implements PaymentService {
 
             double totalAmount = 0;
 
-            // Calculate the total amount with discounts applied
+
             for (CartItem cartItem : cart.getCartItems()) {
                 Game game = cartItem.getGame();
                 double gamePrice = game.getPrice();
 
-                // Apply discount if available
+
                 Discount discount = game.getDiscount();
-                if (discount != null) { // Ensure the discount is valid
+                if (discount != null) {
                     double discountAmount = gamePrice * (discount.getPercentage() / 100);
-                    gamePrice -= discountAmount; // Apply the discount
+                    gamePrice -= discountAmount;
                 }
 
-                // Add the discounted price to totalAmount, considering the quantity
+
                 totalAmount += gamePrice * cartItem.getQuantity();
             }
 
-            // Set the total amount with discount applied
+
             order.setTotalAmount(totalAmount);
 
-            // Save the order first
+
             Order savedOrder = orderRepository.save(order);
 
-            // Create OrderItems and associate them with the saved Order
-            final Order finalSavedOrder = savedOrder;  // Create a final variable to use in lambda
+
+            final Order finalSavedOrder = savedOrder;
             cart.getCartItems().forEach(cartItem -> {
                 OrderItem orderItem = new OrderItem();
                 orderItem.setGame(cartItem.getGame());
                 orderItem.setQuantity(cartItem.getQuantity());
-                orderItem.setOrder(finalSavedOrder); // Associate with the saved Order
+                orderItem.setOrder(finalSavedOrder);
 
-                // Calculate the order item price considering the discount
+
                 double itemPrice = cartItem.getGame().getPrice();
                 Discount itemDiscount = cartItem.getGame().getDiscount();
                 if (itemDiscount != null) {
                     double discountAmount = itemPrice * (itemDiscount.getPercentage() / 100);
-                    itemPrice -= discountAmount; // Apply the discount to the order item
+                    itemPrice -= discountAmount;
                 }
-                orderItem.setOrderItemPrice(itemPrice * cartItem.getQuantity()); // Set the item price considering the quantity
+                orderItem.setOrderItemPrice(itemPrice * cartItem.getQuantity());
 
-                finalSavedOrder.addOrderItem(orderItem); // Add OrderItem to the Order
+                finalSavedOrder.addOrderItem(orderItem);
 
                 // Save the OrderItem
                 orderItemRepository.save(orderItem);
             });
 
-            // Save the order again with associated OrderItems
+
             orderRepository.save(finalSavedOrder);
 
-            // Clear the cart items
+
             cart.getCartItems().clear();
             cartRepository.save(cart);
 
-            // Prepare the email body with the discounted total
+
             StringBuilder gameNames = new StringBuilder();
             StringBuilder gameCodes = new StringBuilder();
 
             for (OrderItem orderItem : savedOrder.getOrderItems()) {
                 Game game = orderItem.getGame();
-                String gameCode = generateRandomGameCode(); // Generate a random code for each game
+                String gameCode = generateRandomGameCode();
 
                 gameNames.append(game.getTitle()).append(", ");
                 gameCodes.append("\n- ").append(game.getTitle()).append(" (Game Code: ").append(gameCode).append(")\n");
             }
 
-            // Remove the last comma and space if there are any game names
+
             if (gameNames.length() > 0) {
                 gameNames.setLength(gameNames.length() - 2);
             }
@@ -224,7 +220,7 @@ public class PaymentServiceImpl implements PaymentService {
             DecimalFormat df = new DecimalFormat("#.00");
             String formattedTotalAmount = df.format(totalAmount);
             // Prepare email details
-            String userEmail = cart.getUser().getEmail(); // Assuming the User entity has an email field
+            String userEmail = cart.getUser().getEmail();
             String subject = "Thank You for Your Purchase!";
             String body = "Dear " + cart.getUser().getFirstName() + ",\n\n" +
                     "Thank you for your purchase! Your order for the game(s) has/have been successfully placed.\n" +
@@ -243,15 +239,15 @@ public class PaymentServiceImpl implements PaymentService {
                     .addAllLineItem(lineItems)
                     .build();
 
-            // Create session
-            return Session.create(params);  // This may throw a StripeException if something goes wrong
+
+            return Session.create(params);
         } catch (StripeException e) {
-            // Log the Stripe error message
+
             System.out.println("StripeException: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Error creating Stripe checkout session", e); // You can return a custom error or rethrow
+            throw new RuntimeException("Error creating Stripe checkout session", e);
         } catch (Exception e) {
-            // Catch general exceptions
+
             System.out.println("Exception: " + e.getMessage());
             e.printStackTrace();
 

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class CreateWishListDTO {
     private Long userId;
     private LocalDate creationDate;
-    // Other fields if needed
 
-    // Getters and Setters
+
+
 }

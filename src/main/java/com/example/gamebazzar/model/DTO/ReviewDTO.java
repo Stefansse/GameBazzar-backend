@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class ReviewDTO {
     private Long gameId;
     private String gameName;
-    private String gameImageUrl; // Optional if you store images
+    private String gameImageUrl;
     private Long userId;
     private Integer rating;
     private String comment;

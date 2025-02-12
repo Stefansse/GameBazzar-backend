@@ -21,7 +21,7 @@ public class Ticket {
     private String description;
     private String response;
 
-    private String status; // Open, In Progress, Resolved
+    private String status;
     private LocalDateTime submittedAt;
     private LocalDateTime resolvedAt;
 
@@ -31,7 +31,7 @@ public class Ticket {
     private User user;
 
     public Ticket() {
-        this.submittedAt = LocalDateTime.now(); // Set default submitted time when ticket is created
+        this.submittedAt = LocalDateTime.now();
         this.status = "Open";
     }
 
