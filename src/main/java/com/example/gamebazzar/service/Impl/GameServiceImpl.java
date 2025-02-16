@@ -4,6 +4,7 @@ import com.example.gamebazzar.model.Game;
 import com.example.gamebazzar.model.enumerations.Genre;
 import com.example.gamebazzar.repository.GameRepository;
 import com.example.gamebazzar.service.GameService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public void deleteGameById(Long gameId) {
+        if (!gameRepository.existsById(gameId)) {
+            throw new EntityNotFoundException("Game with ID " + gameId + " does not exist.");
+        }
         gameRepository.deleteById(gameId);
     }
 

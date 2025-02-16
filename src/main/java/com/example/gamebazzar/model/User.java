@@ -30,11 +30,14 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     public String firstName;
     public String lastName;
+
+    private String sub;
+
+    private Boolean isGoogleAccount;
 
     @Column(name = "Address")
     private String address;
@@ -78,6 +81,7 @@ public class User implements UserDetails {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.isGoogleAccount = false;
         this.dateJoined = LocalDate.now();
     }
 
@@ -85,6 +89,8 @@ public class User implements UserDetails {
     public User() {
 
     }
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

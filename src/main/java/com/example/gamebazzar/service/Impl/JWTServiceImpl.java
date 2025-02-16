@@ -7,10 +7,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -28,6 +30,22 @@ public class JWTServiceImpl implements JWTService {
                 .compact();
     }
 
+    @Override
+    public String generateToken(OAuth2User oauth2User) {
+        // Extract necessary claims from OAuth2 user
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", oauth2User.getAttribute("email"));
+        claims.put("roles", oauth2User.getAuthorities());
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(oauth2User.getName())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
 
     public String generateRefreshToken(Map<String, Objects> extraClaims, UserDetails userDetails){
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
@@ -36,6 +54,8 @@ public class JWTServiceImpl implements JWTService {
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
+
 
 
 

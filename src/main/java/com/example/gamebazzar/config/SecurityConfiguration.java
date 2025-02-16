@@ -35,26 +35,33 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors(withDefaults())
+                .cors(withDefaults())  // Enable CORS with default settings
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/h2/**",
-                                "/error",
-                                "/favicon.ico",
+                                "/api/v1/auth/**",  // Public authentication endpoints
+                                "/h2/**",           // H2 console access
+                                "/error",           // Error page
+                                "/favicon.ico",     // Favicon
                                 "/static/**",
-                                "/api/games/**"
+                                "/api/games/**",
+                                "/api/auth/google"
+                                // Static files
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority(Role.ROLE_ADMIN.name())
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/admin/**").hasAuthority(Role.ROLE_ADMIN.name())  // Admin role required// Authenticated users required
+                        .anyRequest().authenticated()// Other endpoints open to all
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless session management
                 )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider())  // Custom authentication provider
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler((request, response, authentication) -> {
+                            response.sendRedirect("/api/v1/oauth2/success");
+                        })
+                );// JWT authentication filter
 
-        http.headers().frameOptions().disable();
+        http.headers().frameOptions().disable();  // Disable frame options for H2 console
         return http.build();
     }
 

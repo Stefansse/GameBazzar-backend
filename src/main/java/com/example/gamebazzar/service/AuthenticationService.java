@@ -5,6 +5,7 @@ import com.example.gamebazzar.model.jwtlogin.JwtAuthenticationResponse;
 import com.example.gamebazzar.model.jwtlogin.RefreshTokenRequest;
 import com.example.gamebazzar.model.jwtlogin.SignInRequest;
 import com.example.gamebazzar.model.jwtlogin.SignUpRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 public interface AuthenticationService {
 
@@ -12,5 +13,8 @@ public interface AuthenticationService {
 
     JwtAuthenticationResponse signin(SignInRequest signInRequest);
 
-    public JwtAuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest);
+     JwtAuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest);
+
+    JwtAuthenticationResponse AuthenticateWithGoogle(GoogleIdToken.Payload payload);
+
 }

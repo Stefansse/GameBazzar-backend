@@ -6,9 +6,15 @@ import com.example.gamebazzar.model.DTO.filtersDTO.GameFilterDTO;
 import com.example.gamebazzar.model.DTO.filtersDTO.GenreFilterDTO;
 import com.example.gamebazzar.model.Game;
 import com.example.gamebazzar.service.GameService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +25,8 @@ import java.util.Optional;
 public class GameController {
 
     private final GameService gameService;
+
+
 
     public GameController(GameService gameService) {
         this.gameService = gameService;
@@ -95,6 +103,19 @@ public class GameController {
     @GetMapping("/search")
     public List<Game> searchGamesByTitle(@RequestParam String title) {
         return gameService.getGamesByTitle(title);
+    }
+
+
+    @DeleteMapping("/{gameId}")
+    public ResponseEntity<String> deleteGameById(@PathVariable Long gameId) {
+        try {
+            gameService.deleteGameById(gameId);
+            return ResponseEntity.ok("Game with ID " + gameId + " has been deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the game.");
+        }
     }
 
 }
